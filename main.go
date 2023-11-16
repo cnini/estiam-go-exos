@@ -14,6 +14,16 @@ func Get(d map[string]string, key string) (string, error) {
 	}
 }
 
+func Remove(d map[string]string, key string) (string, error) {
+	_, exists := Get(d, key)
+	if exists != nil {
+		return "", exists
+	} else {
+		delete(d, key)
+		return key + " key deleted", nil
+	}
+}
+
 func main() {
 	d := make(map[string]string)
 
@@ -24,18 +34,34 @@ func main() {
 	Add(d, "poire", "pear")    // d["poire"] = "pear"
 
 	// Get value from existing key
-	bVal, bErr := Get(d, "banane")
-	if bErr != nil {
-		fmt.Println("banane (error):", bErr.Error())
+	getBananeVal, getBananeErr := Get(d, "banane")
+	if getBananeErr != nil {
+		fmt.Println("Get banane (error):", getBananeErr.Error())
 	} else {
-		fmt.Println("banane:", bVal)
+		fmt.Println("Get banane:", getBananeVal)
 	}
 
 	// Get value from non-existing key
-	fVal, fErr := Get(d, "fraise")
-	if fErr != nil {
-		fmt.Println("fraise (error):", fErr.Error())
+	getFraiseVal, getFraiseErr := Get(d, "fraise")
+	if getFraiseErr != nil {
+		fmt.Println("Get fraise (error):", getFraiseErr.Error())
 	} else {
-		fmt.Println("fraise:", fVal)
+		fmt.Println("Get fraise:", getFraiseVal)
+	}
+
+	// Remove key/value pair from existing key
+	removeVoitureMess, removeVoitureErr := Remove(d, "voiture")
+	if removeVoitureErr != nil {
+		fmt.Println("Remove voiture (error):", removeVoitureErr.Error())
+	} else {
+		fmt.Println("Remove voiture:", removeVoitureMess)
+	}
+
+	// Remove key/value pair from non-existing key
+	removeFraiseMess, removeFraiseErr := Remove(d, "fraise")
+	if removeFraiseErr != nil {
+		fmt.Println("Remove fraise (error):", removeFraiseErr.Error())
+	} else {
+		fmt.Println("Remove fraise:", removeFraiseMess)
 	}
 }
