@@ -2,11 +2,12 @@ package main
 
 import (
 	"estiam-go-exos/dictionary"
+	"fmt"
 	"os"
 )
 
 func main() {
-	file, openErr := os.OpenFile("dictionary.txt", os.O_RDWR|os.O_APPEND, 0666)
+	file, openErr := os.OpenFile("dictionary.txt", os.O_RDWR|os.O_APPEND, 0777)
 	dictionary.Check(openErr)
 
 	// Add keys and values to a file
@@ -15,23 +16,31 @@ func main() {
 	dictionary.Add(file, "voiture", "car")
 	dictionary.Add(file, "poire", "pear")
 
-	file.Close()
-
 	// Get value from existing key
-	// getBananeVal, getBananeErr := dictionary.Get(d, "banane")
-	// if getBananeErr != nil {
-	// 	fmt.Println("Get banane (error):", getBananeErr.Error())
-	// } else {
-	// 	fmt.Println("Get banane:", getBananeVal)
-	// }
+	getBananeVal, _, getBananeErr := dictionary.Get(file, "banane")
+	if getBananeErr != nil {
+		fmt.Println("Get 'banana' from key (error):", getBananeErr.Error())
+	} else {
+		fmt.Println("Get 'banana' from key:", getBananeVal)
+	}
+
+	// Get key from existing value
+	getAppleKey, _, getAppleErr := dictionary.Get(file, "apple")
+	if getAppleErr != nil {
+		fmt.Println("Get 'pomme' from value (error):", getAppleErr.Error())
+	} else {
+		fmt.Println("Get 'pomme' from value:", getAppleKey)
+	}
 
 	// Get value from non-existing key
-	// getFraiseVal, getFraiseErr := dictionary.Get(d, "fraise")
-	// if getFraiseErr != nil {
-	// 	fmt.Println("Get fraise (error):", getFraiseErr.Error())
-	// } else {
-	// 	fmt.Println("Get fraise:", getFraiseVal)
-	// }
+	getFraiseVal, _, getFraiseErr := dictionary.Get(file, "fraise")
+	if getFraiseErr != nil {
+		fmt.Println("Get 'strawberry' from key (error):", getFraiseErr.Error())
+	} else {
+		fmt.Println("Get 'strawberry' from key:", getFraiseVal)
+	}
+
+	file.Close()
 
 	// Remove key/value pair from existing key
 	// removeVoitureMess, removeVoitureErr := dictionary.Remove(d, "voiture")
