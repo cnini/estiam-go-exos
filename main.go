@@ -45,4 +45,9 @@ func main() {
 	} else {
 		fmt.Println("Remove fraise:", removeFraiseMess)
 	}
+
+	// List separately the keys and the values of the dictionary
+	keys, values := dictionary.List(d)
+	fmt.Println("List all the keys:", keys)
+	fmt.Println("List all the values:", values)
 }
