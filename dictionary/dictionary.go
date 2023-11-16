@@ -1,9 +1,22 @@
 package dictionary
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
-func Add(d map[string]string, key string, value string) {
-	d[key] = value
+func Check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func Add(file *os.File, key string, value string) {
+	_, err := file.WriteString(key + ":" + value + "\n")
+
+	Check(err)
+
+	file.Sync()
 }
 
 func Get(d map[string]string, key string) (string, error) {
