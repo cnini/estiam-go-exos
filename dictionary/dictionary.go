@@ -51,7 +51,7 @@ func Get(file *os.File, word string) (string, string, error) {
 	return "", "", nil
 }
 
-func Remove(d map[string]string, file *os.File, word string) (string, error) {
+func Remove(file *os.File, word string) (string, error) {
 	wordFound, translationFound, err := Get(file, word)
 
 	if err != nil {
@@ -64,11 +64,26 @@ func Remove(d map[string]string, file *os.File, word string) (string, error) {
 
 	defer tmpFile.Close()
 
-	for k, v := range d {
-		if k != word && v != word {
-			Add(tmpFile, k, v)
+	// Point to the beginning of the file
+	_, seekErr := file.Seek(0, 0)
+	Check(seekErr)
+
+	// Read each line
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := strings.Split(scanner.Text(), ":")
+
+		// If the given word is a key or a value, we pass
+		if line[0] == word || line[1] == word {
+			continue
 		}
+
+		Add(tmpFile, line[0], line[1])
 	}
+
+	err = scanner.Err()
+	Check(err)
 
 	file.Close()
 

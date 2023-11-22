@@ -14,6 +14,7 @@ func Start() {
 
 	router.HandleFunc("/add", AddHandler).Methods("POST")
 	router.HandleFunc("/get", GetHandler).Methods("GET")
+	router.HandleFunc("/remove", RemoveHandler).Methods("DELETE")
 
 	http.Handle("/", router)
 }
@@ -52,4 +53,24 @@ func GetHandler(writer http.ResponseWriter, request *http.Request) {
 	dictionary.Check(getErr)
 
 	fmt.Fprintf(writer, "%s:%s", wordFound, translationFound)
+}
+
+func RemoveHandler(writer http.ResponseWriter, request *http.Request) {
+	word := request.URL.Query().Get("q")
+
+	file, openErr := os.OpenFile("dictionary.txt", os.O_RDWR|os.O_APPEND, 0777)
+	if openErr != nil {
+		http.Error(writer, "Error opening file", http.StatusInternalServerError)
+		return
+	}
+
+	defer file.Close()
+
+	wordToRemove, translationToRemove, getErr := dictionary.Get(file, word)
+	dictionary.Check(getErr)
+
+	_, removeErr := dictionary.Remove(file, word)
+	dictionary.Check(removeErr)
+
+	fmt.Fprintf(writer, "remove %s:%s", wordToRemove, translationToRemove)
 }
