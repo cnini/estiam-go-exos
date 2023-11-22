@@ -1,0 +1,3 @@
+pomme:apple
+banane:banana
+poire:pear

@@ -21,7 +21,7 @@ func Add(file *os.File, key string, value string) {
 	file.Sync()
 }
 
-func Get(file *os.File, word string) (string, int, error) {
+func Get(file *os.File, word string) (string, error) {
 	// Point to the beginning of the file
 	_, seekErr := file.Seek(0, 0)
 	Check(seekErr)
@@ -29,7 +29,6 @@ func Get(file *os.File, word string) (string, int, error) {
 	// Read each line
 	scanner := bufio.NewScanner(file)
 
-	lineNumber := 1
 	founded := false
 
 	for scanner.Scan() {
@@ -38,38 +37,57 @@ func Get(file *os.File, word string) (string, int, error) {
 		// If the given word is a key
 		if line[0] == word {
 			founded = true
-			return line[1], lineNumber, nil
+			return line[1], nil
 		}
 
 		// If the given word is a value
 		if line[1] == word {
 			founded = true
-			return line[0], lineNumber, nil
+			return line[0], nil
 		}
-
-		lineNumber++
 	}
 
 	if !founded {
-		return "", 0, fmt.Errorf("%s key does not exist in this file", word)
+		return "", fmt.Errorf("%s does not exist in this file", word)
 	}
 
 	err := scanner.Err()
 	Check(err)
 
-	return "", 0, nil
+	return "", nil
 }
 
-// func Remove(d map[string]string, key string) (string, error) {
-// 	_, err := Get(d, key)
+func Remove(d map[string]string, file *os.File, word string) (string, error) {
+	translation, err := Get(file, word)
 
-// 	if err != nil {
-// 		return "", err
-// 	} else {
-// 		delete(d, key)
-// 		return key + " key deleted", nil
-// 	}
-// }
+	if err != nil {
+		return "", err
+	}
+
+	// Create a temporary file
+	tmpFile, createErr := os.OpenFile("tmp_dictionary.txt", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0777)
+	Check(createErr)
+
+	defer tmpFile.Close()
+
+	for k, v := range d {
+		if k != word && v != word {
+			Add(tmpFile, k, v)
+		}
+	}
+
+	file.Close()
+
+	removeErr := os.Remove("dictionary.txt")
+	Check(removeErr)
+
+	tmpFile.Close()
+
+	renameErr := os.Rename("tmp_dictionary.txt", "dictionary.txt")
+	Check(renameErr)
+
+	return "<<" + word + ":" + translation + ">> translation deleted", nil
+}
 
 // func List(d map[string]string) ([]string, []string) {
 // 	var keys []string
