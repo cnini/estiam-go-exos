@@ -12,6 +12,7 @@ import (
 func Start() {
 	router := mux.NewRouter()
 
+	router.HandleFunc("/list", ListHandler).Methods("GET")
 	router.HandleFunc("/add", AddHandler).Methods("POST")
 	router.HandleFunc("/get", GetHandler).Methods("GET")
 	router.HandleFunc("/remove", RemoveHandler).Methods("DELETE")
@@ -21,6 +22,21 @@ func Start() {
 
 func ListenAndServe() {
 	http.ListenAndServe(":8080", nil)
+}
+
+func ListHandler(writer http.ResponseWriter, request *http.Request) {
+	file, openErr := os.OpenFile("dictionary.txt", os.O_RDWR|os.O_APPEND, 0777)
+	if openErr != nil {
+		http.Error(writer, "Error opening file", http.StatusInternalServerError)
+		return
+	}
+
+	defer file.Close()
+
+	keys, values := dictionary.List(file)
+
+	fmt.Fprintln(writer, "keys:", keys)
+	fmt.Fprintln(writer, "values:", values)
 }
 
 func AddHandler(writer http.ResponseWriter, request *http.Request) {

@@ -98,18 +98,26 @@ func Remove(file *os.File, word string) (string, error) {
 	return "<<" + wordFound + ":" + translationFound + ">> translation deleted", nil
 }
 
-func List(d map[string]string, file *os.File) ([]string, []string) {
+func List(file *os.File) ([]string, []string) {
 	var keys []string
 	var values []string
 
-	for key, value := range d {
-		_, _, err := Get(file, key)
+	// Point to the beginning of the file
+	_, seekErr := file.Seek(0, 0)
+	Check(seekErr)
 
-		if err == nil {
-			keys = append(keys, key)
-			values = append(values, value)
-		}
+	// Read each line
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := strings.Split(scanner.Text(), ":")
+
+		keys = append(keys, line[0])
+		values = append(values, line[1])
 	}
+
+	err := scanner.Err()
+	Check(err)
 
 	return keys, values
 }
