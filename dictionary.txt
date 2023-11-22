@@ -1,0 +1,4 @@
+pomme:apple
+voiture:car
+marron:brown
+carré:square
