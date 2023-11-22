@@ -25,7 +25,7 @@ func main() {
 	}
 
 	// Get value from existing key
-	getBananeVal, getBananeErr := dictionary.Get(file, "banane")
+	_, getBananeVal, getBananeErr := dictionary.Get(file, "banane")
 	if getBananeErr != nil {
 		fmt.Println("Get 'banana' from key (error):", getBananeErr.Error())
 	} else {
@@ -33,7 +33,7 @@ func main() {
 	}
 
 	// Get key from existing value
-	getAppleKey, getAppleErr := dictionary.Get(file, "apple")
+	getAppleKey, _, getAppleErr := dictionary.Get(file, "apple")
 	if getAppleErr != nil {
 		fmt.Println("Get 'pomme' from value (error):", getAppleErr.Error())
 	} else {
@@ -41,7 +41,7 @@ func main() {
 	}
 
 	// Get value from non-existing key
-	getFraiseVal, getFraiseErr := dictionary.Get(file, "fraise")
+	getFraiseVal, _, getFraiseErr := dictionary.Get(file, "fraise")
 	if getFraiseErr != nil {
 		fmt.Println("Get 'strawberry' from key (error):", getFraiseErr.Error())
 	} else {
@@ -56,8 +56,13 @@ func main() {
 		fmt.Println("Remove voiture:", removeVoitureMess)
 	}
 
+	newFile, newOpenErr := os.OpenFile("dictionary.txt", os.O_RDWR|os.O_APPEND, 0777)
+	dictionary.Check(newOpenErr)
+
+	defer newFile.Close()
+
 	// List separately the keys and the values of the dictionary
-	// keys, values := dictionary.List(d)
-	// fmt.Println("List all the keys:", keys)
-	// fmt.Println("List all the values:", values)
+	keys, values := dictionary.List(d, newFile)
+	fmt.Println("List all the keys:", keys)
+	fmt.Println("List all the values:", values)
 }
